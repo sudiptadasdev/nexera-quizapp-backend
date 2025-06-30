@@ -9,6 +9,10 @@ from db.session import get_db
 from dotenv import load_dotenv
 import os
 import uuid
+import smtplib
+from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 load_dotenv()
 
@@ -65,3 +69,38 @@ def get_current_user(
         raise unauthorized_exc
 
     return user
+
+# Send registration confirmation email
+def send_verification_email(to_email, full_name):
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "Welcome to NexEra Quiz App!"
+        msg["From"] = f"NexEra Quiz App <{os.getenv('EMAIL_USERNAME')}>"
+        msg["To"] = to_email
+
+        # HTML version
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6;">
+            <p>Hi <strong>{full_name}</strong>,</p>
+            <p>Welcome to <strong>NexEra Quiz App</strong>!</p>
+            <p>You’ve successfully registered.<br>
+            Start by logging in to your dashboard and taking your first quiz.</p>
+            <br>
+            <p><em>Good luck and have fun!</em></p>
+            <p>— Team NexEra</p>
+        </body>
+        </html>
+        """
+
+        msg.attach(MIMEText(html, "html"))
+
+        with smtplib.SMTP(os.getenv("EMAIL_HOST"), int(os.getenv("EMAIL_PORT"))) as smtp:
+            smtp.starttls()
+            smtp.login(os.getenv("EMAIL_USERNAME"), os.getenv("EMAIL_PASSWORD"))
+            smtp.send_message(msg)
+
+        return True
+    except Exception as e:
+        print("📧 Email send error:", e)
+        return False
