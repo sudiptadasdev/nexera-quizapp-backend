@@ -12,11 +12,14 @@ from docx import Document
 from uuid import UUID
 from datetime import datetime, timedelta
 from pydantic import BaseModel
+from auth.schemas import ProfileUpdate
+
+
 
 router = APIRouter()
 
-class ProfileUpdate(BaseModel):
-    full_name: str
+#class ProfileUpdate(BaseModel):
+ #   full_name: str
 
 
 @router.get("/me")
@@ -142,16 +145,22 @@ def view_profile(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
         "email": current_user.email,
-        "full_name": current_user.full_name
+        "full_name": current_user.full_name,
+        "about": current_user.about
     }
 
 
 @router.put("/profile")
 def edit_profile(update: ProfileUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     current_user.full_name = update.full_name
+    current_user.about = update.about
     db.commit()
     db.refresh(current_user)
-    return {"message": "Profile updated", "full_name": current_user.full_name}
+    return {
+        "message": "Profile updated",
+        "full_name": current_user.full_name,
+        "about": current_user.about
+    }
 
 
 @router.get("/dashboard/history")

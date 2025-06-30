@@ -24,6 +24,11 @@ class UserOut(BaseModel):
     id: uuid.UUID
     email: EmailStr
     full_name: str
+    about: str | None = None
 
     class Config:
         orm_mode = True  # enables ORM to Pydantic conversion
+
+class ProfileUpdate(BaseModel):
+    full_name: str
+    about: str | None = None 

@@ -1,7 +1,4 @@
-from sqlalchemy import (
-    Column, String, Integer, ForeignKey, Boolean,
-    DateTime, Text, JSON
-)
+from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, DateTime, Text, JSON
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql import func
 import uuid
@@ -22,10 +19,11 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    about = Column(Text, nullable=True)
 
     uploads = relationship("UploadedFile", back_populates="user")
     attempts = relationship("QuizAttempt", back_populates="user")
-    answers = relationship("UserAnswer", back_populates="user")  # ✅ Optional but useful
+    answers = relationship("UserAnswer", back_populates="user")
 
 
 class UploadedFile(Base):
