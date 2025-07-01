@@ -1,6 +1,7 @@
 from sqlalchemy.orm import declarative_base
 import uuid
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 Base = declarative_base()
 
@@ -30,5 +31,12 @@ class UserOut(BaseModel):
         orm_mode = True  # enables ORM to Pydantic conversion
 
 class ProfileUpdate(BaseModel):
-    full_name: str
-    about: str | None = None 
+    full_name: Optional[str] = None
+    about: str 
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
