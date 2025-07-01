@@ -152,8 +152,13 @@ def view_profile(current_user: User = Depends(get_current_user)):
 
 @router.put("/profile")
 def edit_profile(update: ProfileUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    current_user.full_name = update.full_name
-    current_user.about = update.about
+    # Only update full_name if it's provided and not empty
+    if update.full_name is not None and update.full_name.strip() != "":
+        current_user.full_name = update.full_name.strip()
+
+    # Always update 'about' as it's required
+    current_user.about = update.about.strip()
+
     db.commit()
     db.refresh(current_user)
     return {

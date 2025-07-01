@@ -10,7 +10,7 @@ from routes.responses_handler import router as answer_router
 from routes.file_processor import router as upload_db_router
 from routes.user_dashboard import router as me_router
 from routes.quizzes_logic import router as quizzes_router
-from auth.routes import auth_router
+from auth.routes import router, auth_router
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +32,7 @@ app.add_middleware(
 
 # Register route groups
 app.include_router(auth_router)
+app.include_router(router)
 app.include_router(answer_router, prefix="/api/answers", tags=["Answers"])
 app.include_router(upload_db_router, prefix="/upload-db", tags=["Upload & Store"])
 app.include_router(me_router, prefix="/user", tags=["Dashboard"])
