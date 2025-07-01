@@ -21,9 +21,24 @@ async def evaluate_user_submission(
 
     if not isinstance(user_answers, (list, dict)):
         raise HTTPException(status_code=422, detail="userAnswers must be a list or dict.")
+    
+    question_ids = [q["id"] for q in quiz_data["questions"]]
+    full_answer_list = []
+    for q in quiz_data["questions"]:
+        qid = str(q["id"])
+        matched = next((a for a in user_answers if str(a["id"]) == qid), None)
+        full_answer_list.append({
+            "id": qid,
+            "answer": matched["answer"] if matched else "Unanswered"
+        })
+    print("✅ Full answer list sent to Gemini:", full_answer_list)
+    
 
     try:
         evaluation = score_user_responses(quiz_data, user_answers)
+        print("📨 userAnswers received:", user_answers)
+        print("📨 quizData.questions count:", len(quiz_data.get("questions", [])))
+        print("🐞 Evaluation returned from Gemini scoring service:", evaluation)
     except Exception as e:
         print("Error while evaluating answers with Gemini:", e)
         return JSONResponse(status_code=500, content={"error": "Failed to evaluate answers."})
@@ -42,14 +57,20 @@ async def evaluate_user_submission(
             user_id=current_user.id,
             attempt_id=new_attempt.id,
             question_id=uuid.UUID(str(res["id"])),
-            answer=res["user_answer"],
+            answer=res.get("user_answer", "Unanswered"),
             is_correct=is_correct
         ))
 
     new_attempt.score = score
     db.commit()
 
-    return JSONResponse(content=evaluation)
+    # Return only the most recent attempt
+    return {
+        "quiz_id": quiz_data["quiz_id"],
+        "score": score,
+        "submitted_at": new_attempt.submitted_at,
+        "results": evaluation["results"]
+    }
 
 @router.get("/attempts")
 def retrieve_all_attempts(
