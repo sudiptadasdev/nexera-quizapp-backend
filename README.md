@@ -106,7 +106,15 @@ MAIL_SSL_TLS=False
 
 
 
-### 6. Run migrations:
+### 6. Create and Run Alembic(Make sure to update your .env file first):
+```bash
+alembic init alembic
+```
+
+```bash
+alembic revision --autogenerate -m "initial migration"
+```
+
 
 ```bash
 alembic upgrade head
@@ -131,6 +139,26 @@ This project uses `pytest` for writing and running test cases.
   
 Before running tests, make sure you have created a virtual environment and installed dependencies
 
+one way to run in case of issue in finding  libraries while runnig pytest:
+
+navigate to nexera-quizapp-backend\backend folder then run the below commands
+
+```bash
+ ..\venv\Scripts\python.exe -m pytest
+ ```
+
+To run specific tests:
+```bash
+ ..\venv\Scripts\python.exe -m pytest tests/file_name.py
+ ```
+
+To run coverage :
+```bash
+.\venv\Scripts\python.exe -m pytest --cov=. tests/
+```
+
+
+
 Run all tests:
 ```bash
 pytest
@@ -141,6 +169,7 @@ Run a specific test file:
 pytest tests/file_name.py
 ```
 ---
+
 
 ## 📬 Contact
 
